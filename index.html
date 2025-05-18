@@ -1,0 +1,199 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Conocimiento de Sí Mismo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="./src/images/CDSM.png">
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+  <!-- Header -->
+  <header class="bg-blue-900 text-white sticky top-0 z-10">
+    <div class="container mx-auto flex justify-between items-center py-4 px-6">
+      <h1 class="text-2xl font-bold">El Conocimiento de Sí Mismo</h1>
+      <nav>
+        <ul class="flex space-x-6">
+          <li><a href="#inicio" class="hover:text-yellow-300">Inicio</a></li>
+          <li><a href="#conferencias" class="hover:text-yellow-300">Conferencias</a></li>
+          <li><a href="#temas" class="hover:text-yellow-300">Temas</a></li>
+          <li><a href="#recursos" class="hover:text-yellow-300">Recursos</a></li>
+          <li><a href="#contacto" class="hover:text-yellow-300">Contacto</a></li>
+        </ul>
+      </nav>
+      <select id="language" class="bg-blue-800 text-white p-2 rounded">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="inicio" class="bg-blue-800 text-white py-20 text-center">
+    <div class="container mx-auto px-6">
+      <h2 class="text-4xl md:text-5xl font-bold mb-4">Descubre el Conocimiento de Sí Mismo</h2>
+      <p class="text-lg md:text-xl mb-6">Explora ciencia, arte, psicología y mística en un viaje hacia tu interior.</p>
+      <a href="#conferencias" class="bg-yellow-500 text-blue-900 px-6 py-3 rounded-full font-semibold hover:bg-yellow-400">Ver Conferencias</a>
+    </div>
+  </section>
+
+  <!-- Temas Principales -->
+  <section id="temas" class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">Nuestros Pilares</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+          <h3 class="text-xl font-semibold mb-2">Ciencia</h3>
+          <p>Explora cómo la ciencia revela los misterios de la mente y el universo.</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Saber más</a>
+        </div>
+        <div class="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+          <h3 class="text-xl font-semibold mb-2">Arte</h3>
+          <p>Descubre la expresión del alma a través de la creatividad y la belleza.</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Saber más</a>
+        </div>
+        <div class="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+          <h3 class="text-xl font-semibold mb-2">Psicología</h3>
+          <p>Comprende las profundidades de la mente y las emociones humanas.</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Saber más</a>
+        </div>
+        <div class="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+          <h3 class="text-xl font-semibold mb-2">Mística</h3>
+          <p>Conecta con lo trascendental y lo espiritual en tu interior.</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Saber más</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conferencias -->
+  <section id="conferencias" class="py-20 bg-gray-200">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">Conferencias en Todo el Mundo</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-2">Conferencia Virtual: La Mente Consciente</h3>
+          <p>Fecha: 25 de mayo, 2025</p>
+          <p>Idioma: Español</p>
+          <p>Tema: Psicología</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Inscribirse</a>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-2">Conferencia Presencial: Arte y Alma</h3>
+          <p>Fecha: 10 de junio, 2025</p>
+          <p>Lugar: París, Francia</p>
+          <p>Idioma: Francés</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Inscribirse</a>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-2">Conferencia Virtual: Mística Moderna</h3>
+          <p>Fecha: 15 de julio, 2025</p>
+          <p>Idioma: Inglés</p>
+          <p>Tema: Mística</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Inscribirse</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recursos -->
+  <section id="recursos" class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">Recursos para tu Viaje Interior</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-2">Artículos</h3>
+          <p>Lee reflexiones profundas en varios idiomas.</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Explorar</a>
+        </div>
+        <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-2">Videos</h3>
+          <p>Conferencias grabadas y charlas inspiradoras.</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Explorar</a>
+        </div>
+        <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-2">Podcasts</h3>
+          <p>Escucha diálogos sobre los cuatro pilares.</p>
+          <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">Explorar</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-blue-900 text-white py-10">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-4">El Conocimiento de Sí Mismo</h3>
+          <p>Un espacio para explorar ciencia, arte, psicología y mística.</p>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Enlaces Rápidos</h3>
+          <ul class="space-y-2">
+            <li><a href="#inicio" class="hover:text-yellow-300">Inicio</a></li>
+            <li><a href="#conferencias" class="hover:text-yellow-300">Conferencias</a></li>
+            <li><a href="#recursos" class="hover:text-yellow-300">Recursos</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Contacto</h3>
+          <p>Email: contacto@conocimiento.com</p>
+          <p>Redes: @ConocimientoSM</p>
+        </div>
+      </div>
+      <p class="text-center mt-8">© 2025 El Conocimiento de Sí Mismo. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Script básico para cambio de idioma (simulación)
+    const languageSelect = document.getElementById('language');
+    languageSelect.addEventListener('change', (e) => {
+      const lang = e.target.value;
+      alert(`Cambiando a idioma: ${lang}. Implementa aquí la lógica para actualizar el contenido.`);
+      // Aquí puedes integrar un sistema de traducción como i18next o similar.
+    });
+  </script>
+</body>
+</html>
